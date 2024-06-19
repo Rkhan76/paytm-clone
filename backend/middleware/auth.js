@@ -22,8 +22,9 @@ function authenticationMiddleware(req, res, next) {
       })
     }
 
-    if (decoded.userName) {
+    if (decoded.userName && decoded._id) {
       req.userName = decoded.userName
+      req._id = decoded._id
     }
 
     next()

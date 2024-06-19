@@ -1,4 +1,4 @@
-const User = require('../models/user')
+const {User, Account} = require('../models/user')
 const { z } = require('zod')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
@@ -8,6 +8,7 @@ const {
   userSignupDetail,
   updateUserInfoSchema,
 } = require('../type')
+
 const { setter } = require('../utils/cred')
 
 async function handleUserSignup(req, res) {
@@ -39,6 +40,14 @@ async function handleUserSignup(req, res) {
         .status(STATUS_CODE.INTERNAL_SERVER_ERROR)
         .json({ msg: 'Signup failed, please try again' })
     }
+
+    // Create new account 
+    const userId = userSignupResult._id
+
+    await Account.create({
+      userId,
+      balance: 1 + Math.random() * 10000
+    })
 
     return res.status(STATUS_CODE.CREATED).json({ msg: 'Signup successful' })
   } catch (error) {
@@ -85,7 +94,7 @@ async function handleUserSignin(req, res) {
       .json({ msg: 'Your username or password is not correct' })
   }
 
-  const token = setter({ userName })
+  const token = setter(userSinginResult)
 
   return res.status(STATUS_CODE.OK).json({ msg: 'Signin successful', token })
 }
